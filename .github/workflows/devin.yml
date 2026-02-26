@@ -1,0 +1,23 @@
+name: Devin Backlog Controller
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backlog-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run backlog script
+        run: python devin_runner.py
