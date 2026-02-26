@@ -37,13 +37,13 @@ if __name__ == "__main__":
     print(f"Found {len(issues)} open issues.\n")
 
     for issue in issues:
-        number = issue["number"]
-    title = issue["title"]
+      number = issue["number"]
+      title = issue["title"]
 
-    print(f"Mock classifying issue #{number}: {title}")
+      print(f"Mock classifying issue #{number}: {title}")
 
-    fixable = True
+      fixable = True
 
-    if fixable:
-      label_pr(number, "devinfix-candidate")
-      print(f"→ Issue #{number} labeled as devinfix-candidate")
+      if fixable:
+        label_pr(number, "devinfix-candidate")
+        print(f"→ Issue #{number} labeled as devinfix-candidate")

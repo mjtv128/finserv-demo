@@ -3,6 +3,10 @@ name: Devin Backlog Controller
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
   backlog-scan:
     runs-on: ubuntu-latest
