@@ -20,4 +20,6 @@ jobs:
         run: pip install requests
 
       - name: Run backlog script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python devin_runner.py
