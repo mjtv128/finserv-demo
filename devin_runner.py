@@ -1,35 +1,55 @@
-from devin.github_client import fetch_open_issues, label_issue
 from devin.classifier import classify_batch
-
-
-def determine_automation_policy(difficulty, risk):
-    # Simple rule:
-    # High risk or hard changes should not be automated.
-    if risk == "high" or difficulty == "hard":
-        return "manual"
-    return "automatable"
-
+from devin.github_client import (
+    fetch_open_issues,
+    label_issue,
+    post_comment,
+    get_issue_labels,
+    remove_label
+)
+from devin.classifier import classify_batch
 
 def chunk_list(lst, size):
     for i in range(0, len(lst), size):
         yield lst[i:i + size]
 
-def apply_triage_labels(issue_number, classification):
+
+def apply_triage(issue_number, classification):
     difficulty = classification["difficulty"]
-    risk = classification["risk_level"]
-    scope = classification["scope"]
+    summary = classification["summary"]
+    recommended_action = classification["recommended_action"]
+    reason = classification["reason"]
 
-    readiness = determine_automation_policy(difficulty, risk)
+    # Remove existing devin-* labels
+    existing_labels = get_issue_labels(issue_number)
+    for label in existing_labels:
+        if label.startswith("devin-"):
+            remove_label(issue_number, label)
 
-    labels = [
-        f"devin-difficulty-{difficulty}",
-        f"devin-risk-{risk}",
-        f"devin-scope-{scope}",
-        f"devin-{readiness}"
-    ]
+    # Apply fresh label
+    label_issue(issue_number, f"devin-{difficulty}")
 
-    for label in labels:
-        label_issue(issue_number, label)
+    # Post updated triage comment
+    comment_body = f"""
+🤖 **Devin Triage Summary**
+
+**Summary**
+{summary}
+
+**Estimated Effort**
+{difficulty.capitalize()}
+
+**Recommended Action**
+{recommended_action}
+
+**Reasoning**
+{reason}
+
+---
+
+If you'd like Devin to proceed, add the `devin-approve` label.
+"""
+
+    post_comment(issue_number, comment_body)
 
 def main():
     print("🚀 Starting Devin triage automation...\n")
@@ -53,7 +73,7 @@ def main():
             print(f"\nIssue #{number}")
             print(classification)
 
-            apply_triage_labels(number, classification)
+            apply_triage(number, classification)
 
 
 if __name__ == "__main__":

@@ -12,15 +12,15 @@ BATCH_SCHEMA = {
                 "properties": {
                     "issue_number": {"type": "number"},
                     "difficulty": {"type": "string"},
-                    "risk_level": {"type": "string"},
-                    "scope": {"type": "string"},
+                    "summary": {"type": "string"},
+                    "recommended_action": {"type": "string"},
                     "reason": {"type": "string"}
                 },
                 "required": [
                     "issue_number",
                     "difficulty",
-                    "risk_level",
-                    "scope",
+                    "summary",
+                    "recommended_action",
                     "reason"
                 ]
             }
@@ -51,12 +51,16 @@ Description:
     return f"""
 You are assisting with engineering triage for a financial services repository.
 
-For each issue, classify:
+For each issue:
 
-- difficulty: estimated implementation complexity (easy, medium, hard, unsure)
-- risk_level: potential impact if the change is incorrect (low, medium, high, unsure)
-- scope: expected change surface area (single-file, few-files, multi-module, architectural)
-- reason: short explanation for your decision
+1. Write a short, clear summary of the problem.
+2. Estimate overall implementation difficulty:
+   - easy: small, localized change
+   - medium: touches multiple areas or requires moderate reasoning
+   - hard: large refactor, architectural impact, or significant ambiguity
+   - unsure: not enough information
+3. Recommend a next action (e.g., "Generate draft PR", "Manual review first", "Needs clarification").
+4. Provide a brief explanation of your reasoning.
 
 Respond with strict JSON in this format:
 
@@ -65,8 +69,8 @@ Respond with strict JSON in this format:
     {{
       "issue_number": number,
       "difficulty": "easy | medium | hard | unsure",
-      "risk_level": "low | medium | high | unsure",
-      "scope": "single-file | few-files | multi-module | architectural",
+      "summary": "short problem summary",
+      "recommended_action": "clear next step",
       "reason": "brief explanation"
     }}
   ]

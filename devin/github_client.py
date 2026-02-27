@@ -29,3 +29,10 @@ def label_issue(issue_number, label):
         json={"labels": [label]}
     )
     response.raise_for_status()
+
+def remove_label(issue_number, label_name):
+    url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/issues/{issue_number}/labels/{label_name}"
+    response = requests.delete(url, headers=HEADERS)
+    # GitHub returns 404 if label doesn't exist, which is fine
+    if response.status_code not in (200, 204, 404):
+        response.raise_for_status()
