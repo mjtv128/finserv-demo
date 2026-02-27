@@ -1,5 +1,7 @@
 from .devin_client import create_session, wait_for_session
 
+
+# Expected structured response from Devin
 BATCH_SCHEMA = {
     "type": "object",
     "properties": {
@@ -29,10 +31,10 @@ BATCH_SCHEMA = {
 
 
 def build_batch_prompt(issues):
-    sections = []
+    issue_sections = []
 
     for issue in issues:
-        sections.append(
+        issue_sections.append(
             f"""
 Issue #{issue["number"]}
 
@@ -44,17 +46,17 @@ Description:
 """
         )
 
-    issues_block = "\n\n---\n\n".join(sections)
+    issues_block = "\n\n---\n\n".join(issue_sections)
 
     return f"""
-You are helping triage issues in a financial services codebase.
+You are assisting with engineering triage for a financial services repository.
 
 For each issue, classify:
 
-- difficulty: how complex the change likely is (easy, medium, hard, unsure)
-- risk_level: impact if implemented incorrectly (low, medium, high, unsure)
-- scope: how much of the codebase is likely affected (single-file, few-files, multi-module, architectural)
-- reason: short explanation
+- difficulty: estimated implementation complexity (easy, medium, hard, unsure)
+- risk_level: potential impact if the change is incorrect (low, medium, high, unsure)
+- scope: expected change surface area (single-file, few-files, multi-module, architectural)
+- reason: short explanation for your decision
 
 Respond with strict JSON in this format:
 
