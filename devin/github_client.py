@@ -36,3 +36,14 @@ def remove_label(issue_number, label_name):
     # GitHub returns 404 if label doesn't exist, which is fine
     if response.status_code not in (200, 204, 404):
         response.raise_for_status()
+        
+def post_comment(issue_number, body):
+    url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/issues/{issue_number}/comments"
+
+    response = requests.post(
+        url,
+        headers=HEADERS,
+        json={"body": body}
+    )
+
+    response.raise_for_status()
