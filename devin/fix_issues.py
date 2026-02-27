@@ -30,9 +30,13 @@ def run_execution_cycle():
 
         if "devin-easy" not in labels and "devin-medium" not in labels:
             continue
-
+        
         if "devin-in-progress" in labels:
-            continue
+          print(f"Clearing stale in-progress label for issue #{issue['number']}")
+          remove_label(issue['number'], "devin-in-progress")
+
+        # if "devin-in-progress" in labels:
+        #     continue
 
         execute_issue(issue)
         break

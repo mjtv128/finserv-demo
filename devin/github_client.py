@@ -97,7 +97,9 @@ def create_branch(branch_name, base_sha):
         },
         timeout=20
     )
-
+    if response.status_code == 422:
+        # Branch already exists — safe to continue
+        return
     response.raise_for_status()
 
 def create_or_update_file(path, content, branch, message):
