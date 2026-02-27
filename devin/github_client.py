@@ -118,6 +118,25 @@ def create_or_update_file(path, content, branch, message):
 
     response.raise_for_status()
 
+# def create_draft_pr(title, body, head_branch, base_branch):
+#     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/pulls"
+
+#     response = requests.post(
+#         url,
+#         headers=HEADERS,
+#         json={
+#             "title": title,
+#             "body": body,
+#             "head": head_branch,
+#             "base": base_branch,
+#             "draft": True
+#         },
+#         timeout=20
+#     )
+
+#     response.raise_for_status()
+#     return response.json()
+
 def create_draft_pr(title, body, head_branch, base_branch):
     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/pulls"
 
@@ -133,6 +152,9 @@ def create_draft_pr(title, body, head_branch, base_branch):
         },
         timeout=20
     )
+
+    print("PR RESPONSE STATUS:", response.status_code)
+    print("PR RESPONSE BODY:", response.text)
 
     response.raise_for_status()
     return response.json()
