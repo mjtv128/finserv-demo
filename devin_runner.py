@@ -66,12 +66,12 @@ def classify_issue(title, body):
 
     Respond ONLY in strict JSON format:
 
-    {
+    {{
       "difficulty": "easy | medium | hard | unsure",
       "automation_category": "safe | review-needed",
       "risk_level": "low | medium | high",
       "reason": "short explanation"
-    }
+    }}
 
     Do not include markdown.
     Do not include extra commentary.
