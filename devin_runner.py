@@ -1,9 +1,12 @@
 import os
 import requests
+import time 
 
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 DEVIN_API_KEY = os.environ.get("DEVIN_API_KEY")
+BASE_URL = "https://api.devin.ai/v1/sessions"
+
 
 HEADERS = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
@@ -30,16 +33,49 @@ def label_pr(issue_number, label):
     response = requests.post(url, headers=HEADERS, json={"labels": [label]})
     response.raise_for_status()
 
-def classify_issue(title, body):
-    url = "https://api.devin.ai/v1/sessions"
-
+def create_session(prompt, schema):
     headers = {
         "Authorization": f"Bearer {DEVIN_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    prompt = f"""You are an AI engineering triage assistant working on a large financial services monorepo.
-    Your task is to evaluate a GitHub issue and classify it for automation readiness.
+    response = requests.post(
+        BASE_URL,
+        headers=headers,
+        json={
+            "prompt": prompt,
+            "structured_output_schema": schema
+        }
+    )
+
+    response.raise_for_status()
+    return response.json()["session_id"]
+
+def wait_for_session(session_id, timeout=40, interval=2):
+    headers = {
+        "Authorization": f"Bearer {DEVIN_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    status_url = f"{BASE_URL}/{session_id}"
+    elapsed = 0
+
+    while elapsed < timeout:
+        time.sleep(interval)
+        elapsed += interval
+
+        response = requests.get(status_url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("status_enum") == "finished":
+            return data.get("structured_output")
+
+    raise TimeoutError("Devin session did not finish in time.")
+
+
+def classify_issue(title, body):
+    prompt = f"""You are an AI engineering triage assistant.
 
     Issue Title:
     {title}
@@ -47,24 +83,7 @@ def classify_issue(title, body):
     Issue Description:
     {body}
 
-    Evaluate the issue across the following dimensions:
-
-    1. difficulty
-      - "easy"   → small bug, localized change, likely 1–2 files
-      - "medium" → bounded change, may touch multiple files but not architectural
-      - "hard"   → complex change, cross-cutting logic or significant refactor
-      - "unsure" → insufficient information to determine scope
-
-    2. automation_category
-      - "safe" → likely safe for automated patch generation with human review
-      - "review-needed" → requires human inspection before automation attempts
-
-    3. risk_level
-      - "low"    → minimal business or system impact
-      - "medium" → moderate impact, some financial or logic sensitivity
-      - "high"   → high business, compliance, or architectural risk
-
-    Respond ONLY in strict JSON format:
+    Respond ONLY in strict JSON:
 
     {{
       "difficulty": "easy | medium | hard | unsure",
@@ -72,24 +91,24 @@ def classify_issue(title, body):
       "risk_level": "low | medium | high",
       "reason": "short explanation"
     }}
-
-    Do not include markdown.
-    Do not include extra commentary.
-    Return valid JSON only.
     """
 
-    response = requests.post(
-        url,
-        headers=headers,
-        json={"prompt": prompt}
-    )
+    schema = {
+        "type": "object",
+        "properties": {
+            "difficulty": {"type": "string"},
+            "automation_category": {"type": "string"},
+            "risk_level": {"type": "string"},
+            "reason": {"type": "string"}
+        },
+        "required": ["difficulty", "automation_category", "risk_level", "reason"]
+    }
 
-    response.raise_for_status()
-    data = response.json()
-
-    print("Devin raw response:", data)  # TEMPORARY — for debugging
-
-    return data
+    return devin_structured_call(prompt, schema)
+  
+def devin_structured_call(prompt, schema):
+    session_id = create_session(prompt, schema)
+    return wait_for_session(session_id)
 
 if __name__ == "__main__":
     print("🚀 Starting backlog scan...\n")
@@ -101,9 +120,12 @@ if __name__ == "__main__":
     for issue in issues:
       number = issue["number"]
       title = issue["title"]
+      body = issue.get("body") or ""
+      
 
       print(f"\nClassifying issue #{number}: {title}")
-      body = issue.get("body") or ""
+
+      
       result = classify_issue(title, body)
 
       # result = classify_issue(title, issue.get("body", ""))
