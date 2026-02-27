@@ -1,6 +1,5 @@
 from .devin_client import create_session, wait_for_session
 
-
 BATCH_SCHEMA = {
     "type": "object",
     "properties": {
@@ -11,15 +10,15 @@ BATCH_SCHEMA = {
                 "properties": {
                     "issue_number": {"type": "number"},
                     "difficulty": {"type": "string"},
-                    "automation_category": {"type": "string"},
                     "risk_level": {"type": "string"},
+                    "scope": {"type": "string"},
                     "reason": {"type": "string"}
                 },
                 "required": [
                     "issue_number",
                     "difficulty",
-                    "automation_category",
                     "risk_level",
+                    "scope",
                     "reason"
                 ]
             }
@@ -30,10 +29,10 @@ BATCH_SCHEMA = {
 
 
 def build_batch_prompt(issues):
-    formatted = []
+    sections = []
 
     for issue in issues:
-        formatted.append(
+        sections.append(
             f"""
 Issue #{issue["number"]}
 
@@ -41,39 +40,44 @@ Title:
 {issue["title"]}
 
 Description:
-{issue.get("body") or ""}
+{issue.get("body") or "No description provided."}
 """
         )
 
-    joined = "\n\n---\n\n".join(formatted)
+    issues_block = "\n\n---\n\n".join(sections)
 
     return f"""
-You are an AI engineering triage assistant.
+You are helping triage issues in a financial services codebase.
 
-Classify EACH issue below.
+For each issue, classify:
 
-Return STRICT JSON in this format:
+- difficulty: how complex the change likely is (easy, medium, hard, unsure)
+- risk_level: impact if implemented incorrectly (low, medium, high, unsure)
+- scope: how much of the codebase is likely affected (single-file, few-files, multi-module, architectural)
+- reason: short explanation
+
+Respond with strict JSON in this format:
 
 {{
   "results": [
     {{
       "issue_number": number,
       "difficulty": "easy | medium | hard | unsure",
-      "automation_category": "safe | review-needed",
-      "risk_level": "low | medium | high",
-      "reason": "short explanation"
+      "risk_level": "low | medium | high | unsure",
+      "scope": "single-file | few-files | multi-module | architectural",
+      "reason": "brief explanation"
     }}
   ]
 }}
 
 Issues:
 
-{joined}
+{issues_block}
 """
 
 
 def classify_batch(issues):
     prompt = build_batch_prompt(issues)
     session_id = create_session(prompt, BATCH_SCHEMA)
-    result = wait_for_session(session_id)
-    return result.get("results", [])
+    response = wait_for_session(session_id)
+    return response.get("results", [])
