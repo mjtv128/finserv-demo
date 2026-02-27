@@ -35,8 +35,7 @@ def apply_triage(issue_number, classification):
 **Summary**
 {summary}
 
-**Estimated Effort**
-{difficulty.capitalize()}
+**Estimated Difficulty** {difficulty.capitalize()}
 
 **Recommended Action**
 {recommended_action}
@@ -44,9 +43,6 @@ def apply_triage(issue_number, classification):
 **Reasoning**
 {reason}
 
----
-
-If you'd like Devin to proceed, add the `devin-approve` label.
 """
 
     post_comment(issue_number, comment_body)
