@@ -51,7 +51,7 @@ def create_session(prompt, schema):
     response.raise_for_status()
     return response.json()["session_id"]
 
-def wait_for_session(session_id, timeout=40, interval=2):
+def wait_for_session(session_id, timeout=60, interval=2):
     headers = {
         "Authorization": f"Bearer {DEVIN_API_KEY}",
         "Content-Type": "application/json"
@@ -68,10 +68,10 @@ def wait_for_session(session_id, timeout=40, interval=2):
         response.raise_for_status()
         data = response.json()
 
-        if data.get("status_enum") == "finished":
-            return data.get("structured_output")
+        if data.get("structured_output"):
+            return data["structured_output"]
 
-    raise TimeoutError("Devin session did not finish in time.")
+    raise TimeoutError("Devin session did not return structured output in time.")
 
 
 def classify_issue(title, body):
