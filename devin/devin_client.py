@@ -57,14 +57,18 @@ def wait_for_session(session_id, timeout=300, interval=5):
         response.raise_for_status()
 
         data = response.json()
-        output = data.get("structured_output")
 
-        if output:
-            status = output.get("status")
+        print("\n--- FULL SESSION RESPONSE ---")
+        print(data)
+        print("-----------------------------\n")
+
+        structured = data.get("structured_output")
+
+        if structured:
+            status = structured.get("status")
+            print("Structured status:", status)
 
             if status in ["completed", "failed"]:
-                return output
-
-            print(f"Session still running... status={status}")
+                return structured
 
     raise TimeoutError("Devin session timed out.")
