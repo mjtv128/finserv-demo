@@ -1,6 +1,6 @@
 import os
 import requests
-import base64
+# import base64
 
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
@@ -50,75 +50,75 @@ def post_comment(issue_number, body):
     response = requests.post(url, headers=HEADERS, json={"body": body})
     response.raise_for_status()
 
-def count_open_devin_prs():
-    url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/pulls"
-    params = {"state": "open", "per_page": 100}
+# def count_open_devin_prs():
+#     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/pulls"
+#     params = {"state": "open", "per_page": 100}
 
-    response = requests.get(url, headers=HEADERS, params=params, timeout=20)
-    response.raise_for_status()
+#     response = requests.get(url, headers=HEADERS, params=params, timeout=20)
+#     response.raise_for_status()
 
-    prs = response.json()
+#     prs = response.json()
 
-    count = 0
-    for pr in prs:
-        labels = [l["name"] for l in pr.get("labels", [])]
-        if "devin-generated" in labels:
-            count += 1
+#     count = 0
+#     for pr in prs:
+#         labels = [l["name"] for l in pr.get("labels", [])]
+#         if "devin-generated" in labels:
+#             count += 1
 
-    return count
+#     return count
 
-def get_default_branch_sha():
-    # Get repo info
-    repo_url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}"
-    repo_response = requests.get(repo_url, headers=HEADERS, timeout=20)
-    repo_response.raise_for_status()
+# def get_default_branch_sha():
+#     # Get repo info
+#     repo_url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}"
+#     repo_response = requests.get(repo_url, headers=HEADERS, timeout=20)
+#     repo_response.raise_for_status()
 
-    repo_data = repo_response.json()
-    default_branch = repo_data["default_branch"]
+#     repo_data = repo_response.json()
+#     default_branch = repo_data["default_branch"]
 
-    # Get branch reference
-    ref_url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/git/ref/heads/{default_branch}"
-    ref_response = requests.get(ref_url, headers=HEADERS, timeout=20)
-    ref_response.raise_for_status()
+#     # Get branch reference
+#     ref_url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/git/ref/heads/{default_branch}"
+#     ref_response = requests.get(ref_url, headers=HEADERS, timeout=20)
+#     ref_response.raise_for_status()
 
-    sha = ref_response.json()["object"]["sha"]
+#     sha = ref_response.json()["object"]["sha"]
 
-    return sha, default_branch
+#     return sha, default_branch
   
-def create_branch(branch_name, base_sha):
-    url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/git/refs"
+# def create_branch(branch_name, base_sha):
+#     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/git/refs"
 
-    response = requests.post(
-        url,
-        headers=HEADERS,
-        json={
-            "ref": f"refs/heads/{branch_name}",
-            "sha": base_sha
-        },
-        timeout=20
-    )
-    if response.status_code == 422:
-        # Branch already exists — safe to continue
-        return
-    response.raise_for_status()
+#     response = requests.post(
+#         url,
+#         headers=HEADERS,
+#         json={
+#             "ref": f"refs/heads/{branch_name}",
+#             "sha": base_sha
+#         },
+#         timeout=20
+#     )
+#     if response.status_code == 422:
+#         # Branch already exists — safe to continue
+#         return
+#     response.raise_for_status()
 
-def create_or_update_file(path, content, branch, message):
-    url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/{path}"
+# def create_or_update_file(path, content, branch, message):
+#     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/{path}"
 
-    encoded_content = base64.b64encode(content.encode()).decode()
+#     encoded_content = base64.b64encode(content.encode()).decode()
 
-    response = requests.put(
-        url,
-        headers=HEADERS,
-        json={
-            "message": message,
-            "content": encoded_content,
-            "branch": branch
-        },
-        timeout=20
-    )
+#     response = requests.put(
+#         url,
+#         headers=HEADERS,
+#         json={
+#             "message": message,
+#             "content": encoded_content,
+#             "branch": branch
+#         },
+#         timeout=20
+#     )
 
-    response.raise_for_status()
+#     response.raise_for_status()
 
 # def create_draft_pr(title, body, head_branch, base_branch):
 #     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/pulls"

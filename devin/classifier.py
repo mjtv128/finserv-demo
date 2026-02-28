@@ -1,7 +1,5 @@
 from .devin_client import create_session, wait_for_session
 
-
-# Expected structured response from Devin
 BATCH_SCHEMA = {
     "type": "object",
     "properties": {

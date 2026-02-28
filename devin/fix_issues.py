@@ -1,16 +1,16 @@
-import time
+# devin/fix_issues.py
 
 from devin.github_client import (
     fetch_open_issues,
-    count_open_devin_prs,
     label_issue,
     remove_label,
-    post_comment,
-    get_default_branch_sha,
-    create_branch,
-    create_or_update_file,
-    create_draft_pr,
+    count_open_devin_prs,
+    post_comment
 )
+
+from devin.classifier import classify_batch
+from devin.devin_worker import run_issue
+
 
 MAX_OPEN_DEVIN_PRS = 5
 
@@ -25,57 +25,72 @@ def run_execution_cycle():
         print("Max PR limit reached.")
         return
 
-    issues = fetch_open_issues(limit=20)
+    issues = fetch_open_issues(limit=10)
 
+    # ---- PHASE 1: TRIAGE (Batch) ----
+    untriaged = []
     for issue in issues:
+        labels = [l["name"] for l in issue.get("labels", [])]
+        if not any(label.startswith("devin-") for label in labels):
+            untriaged.append(issue)
+
+    if untriaged:
+        print("Running batch triage")
+
+        triage_results = classify_batch(untriaged)
+
+        for result in triage_results:
+            issue_number = result["issue_number"]
+            difficulty = result["difficulty"]
+
+            difficulty_label = f"devin-{difficulty}"
+            label_issue(issue_number, difficulty_label)
+
+            comment_body = f"""
+### 🤖 Devin Triage
+
+**Difficulty:** {difficulty}
+
+**Summary:**  
+{result['summary']}
+
+**Recommended Action:**  
+{result['recommended_action']}
+
+**Reasoning:**  
+{result['reason']}
+"""
+
+            post_comment(issue_number, comment_body)
+
+        return  # one phase per run
+
+    # ---- PHASE 2: EXECUTION ----
+    for issue in issues:
+        issue_number = issue["number"]
         labels = [l["name"] for l in issue.get("labels", [])]
 
         if "devin-easy" not in labels and "devin-medium" not in labels:
             continue
-        
+
         if "devin-in-progress" in labels:
-          print(f"Clearing stale in-progress label for issue #{issue['number']}")
-          remove_label(issue['number'], "devin-in-progress")
+            continue
 
-        # if "devin-in-progress" in labels:
-        #     continue
+        print(f"Executing issue #{issue_number}")
 
-        execute_issue(issue)
-        break
+        label_issue(issue_number, "devin-in-progress")
 
+        try:
+            # Re-triage single issue to get structured metadata
+            triage = classify_batch([issue])[0]
 
-def execute_issue(issue):
-    issue_number = issue["number"]
+            result = run_issue(issue, triage)
+            print("Execution result:", result)
 
-    print(f"Executing issue #{issue_number}")
+        finally:
+            remove_label(issue_number, "devin-in-progress")
 
-    label_issue(issue_number, "devin-in-progress")
-    post_comment(issue_number, "🤖 Devin execution started.")
-
-    sha, base_branch = get_default_branch_sha()
-    branch_name = f"devin/issue-{issue_number}"
-
-    create_branch(branch_name, sha)
-
-    create_or_update_file(
-        # path=f"devin_test_{issue_number}.txt",
-
-        path=f"devin_test_{issue_number}_{int(time.time())}.txt",
-        content="Test change from Devin execution layer.",
-        branch=branch_name,
-        message=f"Devin test commit for issue #{issue_number}"
-    )
-
-    pr = create_draft_pr(
-        title=f"[Devin] Test PR for issue #{issue_number}",
-        body="Auto-generated draft PR.",
-        head_branch=branch_name,
-        base_branch=base_branch
-    )
-
-    print("PR created:", pr["html_url"])
-
-    remove_label(issue_number, "devin-in-progress")
+        return  # process one issue per run
 
 
 if __name__ == "__main__":
