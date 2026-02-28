@@ -49,10 +49,29 @@ def run_execution_cycle():
     post_comment(issue_number, "🤖 Devin execution started.")
 
     try:
-        result = run_issue(issue)
-        print("Execution result:", result)
+      result = run_issue(issue)
+
+      print("===== DEVIN RESULT =====")
+      print(result)
+
+      post_comment(issue_number, f"""
+  ### 🤖 Devin Proposed Fix
+
+  **Summary:**
+  {result["summary"]}
+
+  **Files Changed:**
+  {len(result["files_changed"])}
+
+  (See logs for full code.)
+  """)
+
     except Exception as e:
         print("Execution failed:", e)
+    #     result = run_issue(issue)
+    #     print("Execution result:", result)
+    # except Exception as e:
+    #     print("Execution failed:", e)
     finally:
         remove_label(issue_number, "devin-in-progress")
         print("Removed in-progress label.")

@@ -7,10 +7,20 @@ from devin.devin_client import create_session, wait_for_session
 EXECUTION_SCHEMA = {
     "type": "object",
     "properties": {
-        "status": {"type": "string"},
-        "pr_url": {"type": "string"}
+        "summary": {"type": "string"},
+        "files_changed": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "file_path": {"type": "string"},
+                    "new_code": {"type": "string"}
+                },
+                "required": ["file_path", "new_code"]
+            }
+        }
     },
-    "required": ["status"]
+    "required": ["summary", "files_changed"]
 }
 
 
@@ -19,7 +29,7 @@ def run_issue(issue):
     issue_number = issue["number"]
 
     prompt = f"""
-You are an autonomous software engineer.
+You are a software engineer.
 
 Repository: https://github.com/{repo}
 
@@ -31,17 +41,18 @@ Issue Title:
 Issue Body:
 {issue.get('body', '')}
 
-Instructions:
-1. Clone the repository.
-2. Create a new branch named: devin/issue-{issue_number}
-3. Implement the fix.
-4. Commit changes.
-5. Open a DRAFT pull request targeting the default branch.
-6. Reference issue #{issue_number} in the PR description.
-7. Return the PR URL.
+Return structured JSON only:
+
+{
+  "summary": "short explanation of fix",
+  "files_changed": [
+    {
+      "file_path": "path/to/file.py",
+      "new_code": "full updated file content"
+    }
+  ]
+}
 """
 
     session_id = create_session(prompt, EXECUTION_SCHEMA)
-    result = wait_for_session(session_id)
-
-    return result
+    return wait_for_session(session_id)
