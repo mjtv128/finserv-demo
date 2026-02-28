@@ -43,15 +43,15 @@ Issue Body:
 
 Return structured JSON only:
 
-{
+{{
   "summary": "short explanation of fix",
   "files_changed": [
-    {
+    {{
       "file_path": "path/to/file.py",
       "new_code": "full updated file content"
-    }
+    }}
   ]
-}
+}}
 """
 
     session_id = create_session(prompt, EXECUTION_SCHEMA)
