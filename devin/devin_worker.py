@@ -14,46 +14,31 @@ EXECUTION_SCHEMA = {
 }
 
 
-def run_issue(issue, triage):
+def run_issue(issue):
     repo = os.environ.get("GITHUB_REPOSITORY")
     issue_number = issue["number"]
 
     prompt = f"""
-You are an autonomous software engineer operating within a controlled automation system.
+You are an autonomous software engineer.
 
 Repository: https://github.com/{repo}
 
-This issue has already been triaged.
+Fix GitHub issue #{issue_number}.
 
-Issue #{issue_number}
-
-Title:
+Issue Title:
 {issue['title']}
 
-Body:
+Issue Body:
 {issue.get('body', '')}
 
-Triage Summary:
-{triage['summary']}
-
-Difficulty:
-{triage['difficulty']}
-
-Recommended Action:
-{triage['recommended_action']}
-
-Reasoning:
-{triage['reasoning']}
-
 Instructions:
-
-- Only proceed if the issue is small-to-medium in scope.
-- Create branch: devin/issue-{issue_number}
-- Implement the fix.
-- Keep changes minimal and targeted.
-- Open a DRAFT pull request.
-- Reference issue #{issue_number} in the PR description.
-- Return the PR URL.
+1. Clone the repository.
+2. Create a new branch named: devin/issue-{issue_number}
+3. Implement the fix.
+4. Commit changes.
+5. Open a DRAFT pull request targeting the default branch.
+6. Reference issue #{issue_number} in the PR description.
+7. Return the PR URL.
 """
 
     session_id = create_session(prompt, EXECUTION_SCHEMA)
