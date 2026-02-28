@@ -7,20 +7,10 @@ from devin.devin_client import create_session, wait_for_session
 EXECUTION_SCHEMA = {
     "type": "object",
     "properties": {
-        "summary": {"type": "string"},
-        "files_changed": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "file_path": {"type": "string"},
-                    "new_code": {"type": "string"}
-                },
-                "required": ["file_path", "new_code"]
-            }
-        }
+        "analysis": {"type": "string"},
+        "proposed_fix": {"type": "string"}
     },
-    "required": ["summary", "files_changed"]
+    "required": ["analysis", "proposed_fix"]
 }
 
 
@@ -29,28 +19,33 @@ def run_issue(issue):
     issue_number = issue["number"]
 
     prompt = f"""
-You are a software engineer.
+You are a senior software engineer reviewing a GitHub issue.
 
 Repository: https://github.com/{repo}
 
-Fix GitHub issue #{issue_number}.
+Issue #{issue_number}
 
-Issue Title:
+Title:
 {issue['title']}
 
-Issue Body:
+Body:
 {issue.get('body', '')}
+
+Do NOT implement code.
+Do NOT clone the repo.
+Do NOT create branches.
+
+Just analyze the issue and explain:
+
+1. What is causing the bug?
+2. What exact code change should be made?
+3. What file is likely affected?
 
 Return structured JSON only:
 
 {{
-  "summary": "short explanation of fix",
-  "files_changed": [
-    {{
-      "file_path": "path/to/file.py",
-      "new_code": "full updated file content"
-    }}
-  ]
+  "analysis": "clear explanation of root cause",
+  "proposed_fix": "precise description of code change"
 }}
 """
 

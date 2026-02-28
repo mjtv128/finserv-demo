@@ -43,7 +43,7 @@ def create_session(prompt, schema):
 
 #     raise TimeoutError("Devin session timed out.")
 
-def wait_for_session(session_id, timeout=300, interval=5):
+def wait_for_session(session_id, timeout=120, interval=3):
     elapsed = 0
 
     while elapsed < timeout:
@@ -59,7 +59,6 @@ def wait_for_session(session_id, timeout=300, interval=5):
         data = response.json()
 
         structured = data.get("structured_output")
-
         if structured:
             return structured
 
