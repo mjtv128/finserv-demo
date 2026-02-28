@@ -78,6 +78,8 @@ def wait_for_session(session_id, timeout=300, interval=5):
         print("Status:", data.get("status_enum"))
 
         # 🔥 AUTHORITATIVE COMPLETION SIGNAL
+        print("FULL SESSION DATA:")
+        print(data)
         pr = data.get("pull_request")
         if pr:
             return {
