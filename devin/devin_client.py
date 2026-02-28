@@ -74,22 +74,24 @@ def wait_for_session(session_id, timeout=300, interval=5):
         response.raise_for_status()
 
         data = response.json()
+        status = data.get("status_enum")
 
-        print("Status:", data.get("status_enum"))
+        print("Status:", status)
 
-        # 🔥 AUTHORITATIVE COMPLETION SIGNAL
-        print("FULL SESSION DATA:")
-        print(data)
         pr = data.get("pull_request")
+
+        # ✅ If PR exists, we are done
         if pr:
+            print("PR detected:", pr)
             return {
                 "status": "completed",
-                "pr_url": pr.get("html_url")
+                "pr_url": pr.get("html_url") or pr.get("url")
             }
 
-        if data.get("status_enum") == "failed":
+        # ❌ Only fail if explicitly failed
+        if status in ["failed", "blocked"]:
             return {
-                "status": "failed",
+                "status": status,
                 "pr_url": None
             }
 
