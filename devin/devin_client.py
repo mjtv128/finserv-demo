@@ -11,18 +11,35 @@ HEADERS = {
 }
 
 
-def create_session(prompt, schema):
+# def create_session(prompt, schema=None):
+  
+#     response = requests.post(
+#         BASE_URL,
+#         headers=HEADERS,
+#         json={
+#             "prompt": prompt,
+#             "structured_output_schema": schema
+#         }
+#     )
+#     response.raise_for_status()
+#     return response.json()["session_id"]
+
+def create_session(prompt, schema=None):
+    payload = {
+        "prompt": prompt
+    }
+
+    if schema:
+        payload["response_schema"] = schema
+
     response = requests.post(
         BASE_URL,
         headers=HEADERS,
-        json={
-            "prompt": prompt,
-            "structured_output_schema": schema
-        }
+        json=payload
     )
+
     response.raise_for_status()
     return response.json()["session_id"]
-
 
 # def wait_for_session(session_id, timeout=90, interval=2):
 #     elapsed = 0
