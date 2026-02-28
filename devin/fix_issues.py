@@ -51,30 +51,24 @@ def run_execution_cycle():
     try:
       result = run_issue(issue)
 
-      print("===== DEVIN RESULT =====")
-      print(result)
+      if result["status"] == "completed":
+          print("PR created:", result["pr_url"])
 
-      post_comment(issue_number, f"""
-  ### 🤖 Devin Proposed Fix
+          post_comment(issue_number, f"""
+  ### 🤖 Devin Draft PR Created
 
-  **Summary:**
-  {result["summary"]}
-
-  **Files Changed:**
-  {len(result["files_changed"])}
-
-  (See logs for full code.)
+  Draft PR:
+  {result["pr_url"]}
   """)
+
+      else:
+          print("Execution failed.")
 
     except Exception as e:
         print("Execution failed:", e)
-    #     result = run_issue(issue)
-    #     print("Execution result:", result)
-    # except Exception as e:
-    #     print("Execution failed:", e)
+
     finally:
         remove_label(issue_number, "devin-in-progress")
-        print("Removed in-progress label.")
 
 
 if __name__ == "__main__":

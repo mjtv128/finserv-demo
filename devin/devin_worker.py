@@ -4,50 +4,38 @@ import os
 from devin.devin_client import create_session, wait_for_session
 
 
-EXECUTION_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "analysis": {"type": "string"},
-        "proposed_fix": {"type": "string"}
-    },
-    "required": ["analysis", "proposed_fix"]
-}
-
-
 def run_issue(issue):
     repo = os.environ.get("GITHUB_REPOSITORY")
     issue_number = issue["number"]
 
     prompt = f"""
-You are a senior software engineer reviewing a GitHub issue.
+You are an autonomous software engineer.
+
+The repository below is connected via the Devin GitHub integration.
+You have authenticated GitHub access to create branches and open pull requests.
 
 Repository: https://github.com/{repo}
 
-Issue #{issue_number}
+Fix GitHub issue #{issue_number}.
 
-Title:
+Issue Title:
 {issue['title']}
 
-Body:
+Issue Body:
 {issue.get('body', '')}
 
-Do NOT implement code.
-Do NOT clone the repo.
-Do NOT create branches.
+Instructions:
 
-Just analyze the issue and explain:
-
-1. What is causing the bug?
-2. What exact code change should be made?
-3. What file is likely affected?
-
-Return structured JSON only:
-
-{{
-  "analysis": "clear explanation of root cause",
-  "proposed_fix": "precise description of code change"
-}}
+- Create branch: devin/issue-{issue_number}
+- If branch exists, append a unique timestamp suffix.
+- Implement the minimal correct fix.
+- Do not modify unrelated files.
+- Commit changes.
+- Open a DRAFT pull request targeting the default branch.
+- Reference issue #{issue_number} in the PR description.
+- Do NOT merge the PR.
+- Stop once the draft PR is successfully created.
 """
 
-    session_id = create_session(prompt, EXECUTION_SCHEMA)
+    session_id = create_session(prompt)
     return wait_for_session(session_id)

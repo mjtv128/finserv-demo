@@ -43,7 +43,7 @@ def create_session(prompt, schema):
 
 #     raise TimeoutError("Devin session timed out.")
 
-def wait_for_session(session_id, timeout=120, interval=3):
+def wait_for_session(session_id, timeout=300, interval=5):
     elapsed = 0
 
     while elapsed < timeout:
@@ -58,10 +58,20 @@ def wait_for_session(session_id, timeout=120, interval=3):
 
         data = response.json()
 
-        structured = data.get("structured_output")
-        if structured:
-            return structured
-
         print("Status:", data.get("status_enum"))
+
+        # 🔥 AUTHORITATIVE COMPLETION SIGNAL
+        pr = data.get("pull_request")
+        if pr:
+            return {
+                "status": "completed",
+                "pr_url": pr.get("html_url")
+            }
+
+        if data.get("status_enum") == "failed":
+            return {
+                "status": "failed",
+                "pr_url": None
+            }
 
     raise TimeoutError("Devin session timed out.")
