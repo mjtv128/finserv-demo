@@ -20,7 +20,16 @@ def run_execution_cycle():
         return
 
     # Take the first issue only
-    issue = issues[0]
+    issue = None
+
+    for item in issues:
+        if "pull_request" not in item:
+            issue = item
+            break
+
+    if issue is None:
+        print("No eligible issues found.")
+        return
     issue_number = issue["number"]
     labels = [l["name"] for l in issue.get("labels", [])]
 
