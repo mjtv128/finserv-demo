@@ -17,19 +17,16 @@ def process_issue(issue, classification):
 
     label_issue(number, f"devin-{difficulty}")
 
-    body = f"""**Devin Triage Summary**
-
-    **Summary**
-    {summary}
-
-    **Estimated Difficulty** {difficulty.capitalize()}
-
-    **Action**
-    {recommended_action}
-
-    **Reason**
-    {reason}
-    """
+    body = (
+    f"**Devin Triage Summary**\n\n"
+    f"**Summary**\n"
+    f"{summary}\n\n"
+    f"**Estimated Difficulty** {difficulty.capitalize()}\n\n"
+    f"**Action**\n"
+    f"{recommended_action}\n\n"
+    f"**Reason**\n"
+    f"{reason}"
+)
     post_comment(number, body)
 
     send_slack(
