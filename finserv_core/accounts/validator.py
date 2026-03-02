@@ -1,5 +1,6 @@
 def validate_email(email):
-    # Bug: no None check
+    if email is None:
+        return False
     if "@" not in email:
         return False
     return True
