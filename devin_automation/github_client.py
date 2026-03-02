@@ -111,6 +111,12 @@ def status_is_completed(issue_number):
     labels = get_issue_labels(issue_number)
     return "devin-status: completed" in labels
 
+def send_slack(message):
+    webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
+    if not webhook_url:
+        return
+    requests.post(webhook_url, json={"text": message})
+
 # def count_open_devin_prs():
 #     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/pulls"
 #     params = {"state": "open", "per_page": 100}

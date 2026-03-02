@@ -5,9 +5,11 @@ from devin_automation.github_client import (
     post_comment,
     get_issue_labels,
     remove_label,
-    set_devin_status
+    set_devin_status,
+    send_slack
 )
 from devin_automation.issue_runner import execute_issue
+
 import os
 
 
@@ -72,8 +74,12 @@ def main():
     for issue in issues_to_run:
         set_devin_status(issue["number"], "running")
 
-    print(f"Processing {len(issues_to_run)} issues...\n")
+    send_slack(f"🚀 Devin automation started — processing {len(issues_to_run)} issue(s)")
 
+    print(f"Processing {len(issues_to_run)} issues...\n")
+    pr_count = 0
+    flagged_count = 0
+    
     for chunk in chunk_list(issues_to_run, 10):
         # time.sleep(3)
         results = classify_batch(chunk)
@@ -89,13 +95,23 @@ def main():
 
             print(f"\nIssue #{number}")
             print(classification)
+            
+            difficulty = classification["difficulty"]
+            summary = classification["summary"]
 
             apply_triage(number, classification)
+            send_slack(f"🔍 Issue #{number} classified as *{difficulty.upper()}* — {summary}")
 
-            if classification["difficulty"] in ["easy", "medium"]:
+            if difficulty in ["easy", "medium"]:
+                send_slack(f"⚙️ Devin is working on issue #{number}...")
                 execute_issue(issue)
+                pr_count += 1
             else:
-                print(f"Issue #{number} is {classification['difficulty']} - skipping execution")
+                flagged_count += 1
+                send_slack(f"⚠️ Issue #{number} is *{difficulty}* — flagged for senior review")
+                print(f"Issue #{number} is {difficulty} - skipping execution")
+
+    send_slack(f"📊 Run complete — {pr_count} PR(s) opened, {flagged_count} flagged for review")
 
 
 if __name__ == "__main__":
