@@ -27,7 +27,7 @@ def create_session(prompt, schema=None):
     response.raise_for_status()
     return response.json()["session_id"]
 
-def wait_for_session(session_id, timeout=300, interval=5):
+def wait_for_session(session_id, timeout=600, interval=10):
     elapsed = 0
 
     while elapsed < timeout:
@@ -38,16 +38,21 @@ def wait_for_session(session_id, timeout=300, interval=5):
             f"{BASE_URL}/{session_id}",
             headers=HEADERS
         )
+        
+        # If we get a 504, check one more time before giving up
+        if response.status_code == 504:
+            time.sleep(10)
+            response = requests.get(
+                f"{BASE_URL}/{session_id}",
+                headers=HEADERS
+            )
+        
         response.raise_for_status()
-
         data = response.json()
         status = data.get("status_enum")
-
         print("Status:", status)
 
         pr = data.get("pull_request")
-
-        # ✅ If PR exists, we are done
         if pr:
             print("PR detected:", pr)
             return {
@@ -56,6 +61,13 @@ def wait_for_session(session_id, timeout=300, interval=5):
             }
 
         if status in ["failed", "blocked"]:
+            # Check one last time for a PR before marking failed
+            pr = data.get("pull_request")
+            if pr:
+                return {
+                    "status": "completed", 
+                    "pr_url": pr.get("html_url") or pr.get("url")
+                }
             return {
                 "status": status,
                 "pr_url": None
