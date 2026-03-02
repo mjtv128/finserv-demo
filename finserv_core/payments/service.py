@@ -8,6 +8,9 @@ class PaymentService:
         self.account_repo = account_repo
 
     def process_payment(self, payment: Payment):
+        if payment.amount <= 0:
+            raise ValueError("Payment amount must be greater than zero")
+
         from_acct = self.account_repo.get(payment.from_account)
         to_acct = self.account_repo.get(payment.to_account)
 
