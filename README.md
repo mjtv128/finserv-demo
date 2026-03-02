@@ -58,14 +58,6 @@ finserv-demo/
 │   └── github_client.py        # GitHub API client
 │
 ├── finserv_core/               # Demo application — can be any repo or codebase
-│   ├── payments/
-│   ├── accounts/
-│   ├── shared/
-│   ├── transactions/
-│   ├── compliance/
-│   ├── risk/
-│   ├── notifications/
-│   └── tests/
 │
 ├── devin_runner.py             # Orchestration layer — entry point, runs the full pipeline
 └── README.md
