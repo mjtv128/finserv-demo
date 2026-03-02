@@ -6,22 +6,26 @@ import os
 
 def run_execution_cycle():
     print("🚀 Starting execution cycle")
+    
     label = os.environ.get("ISSUE_LABEL", "")
     if label and label != "devin-fix":
+        print("Label not eligible. Skipping.")
         return
 
-    issues = fetch_open_issues(limit=10)
+    issue_number = os.environ.get("ISSUE_NUMBER")
+
+    issues = fetch_open_issues(limit=50)
 
     if not issues:
         print("No open issues found.")
         return
 
-    issue = None
-
-    for item in issues:
-        if "pull_request" not in item:
-            issue = item
-            break
+    if issue_number:
+        # triggered by label event - fix that specific issue
+        issue = next((i for i in issues if str(i["number"]) == str(issue_number) and "pull_request" not in i), None)
+    else:
+        # triggered manually - pick next eligible
+        issue = next((i for i in issues if "pull_request" not in i), None)
 
     if issue is None:
         print("No eligible issues found.")
