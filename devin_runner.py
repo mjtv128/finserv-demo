@@ -20,28 +20,23 @@ def apply_triage(issue_number, classification):
     recommended_action = classification["recommended_action"]
     reason = classification["reason"]
 
-    # existing_labels = get_issue_labels(issue_number)
-    # for label in existing_labels:
-    #     if label.startswith("devin-"):
-    #         remove_label(issue_number, label)
-
     label_issue(issue_number, f"devin-{difficulty}")
 
     comment_body = f"""
- **Devin Triage Summary**
+        **Devin Triage Summary**
 
-**Summary**
-{summary}
+        **Summary**
+        {summary}
 
-**Estimated Difficulty** {difficulty.capitalize()}
+        **Estimated Difficulty** {difficulty.capitalize()}
 
-**Recommended Action**
-{recommended_action}
+        **Action**
+        {recommended_action}
 
-**Reasoning**
-{reason}
+        **Reason**
+        {reason}
 
-"""
+        """
 
     post_comment(issue_number, comment_body)
 
@@ -109,6 +104,7 @@ def main():
                     pr_urls.append(f"• Issue #{number}: {pr_url}")
                     send_slack(f"✅ Issue #{number} — draft PR opened: {pr_url}")
             else:
+                set_devin_status(number, "needs review")
                 flagged_count += 1
                 send_slack(f"⚠️ Issue #{number} is *{difficulty}* — flagged for senior review")
                 print(f"Issue #{number} is {difficulty} - skipping execution")
