@@ -1,4 +1,4 @@
-from .devin_client import create_session, wait_for_session
+from .devin_client import create_session, wait_for_structured_output
 
 BATCH_SCHEMA = {
     "type": "object",
@@ -83,5 +83,7 @@ Issues:
 def classify_batch(issues):
     prompt = build_batch_prompt(issues)
     session_id = create_session(prompt, BATCH_SCHEMA)
-    response = wait_for_session(session_id)
+    response = wait_for_structured_output(session_id)
+    if not response:
+        return []
     return response.get("results", [])

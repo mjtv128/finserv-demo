@@ -63,3 +63,28 @@ def wait_for_session(session_id, timeout=300, interval=5):
             }
 
     raise TimeoutError("Devin session timed out.")
+
+def wait_for_structured_output(session_id, timeout=120, interval=5):
+    elapsed = 0
+
+    while elapsed < timeout:
+        time.sleep(interval)
+        elapsed += interval
+
+        response = requests.get(
+            f"{BASE_URL}/{session_id}",
+            headers=HEADERS
+        )
+        response.raise_for_status()
+
+        data = response.json()
+        status = data.get("status_enum")
+        print("Classifier status:", status)
+
+        if data.get("structured_output"):
+            return data["structured_output"]
+
+        if status in ["failed", "blocked"]:
+            return None
+
+    raise TimeoutError("Classifier session timed out.")
