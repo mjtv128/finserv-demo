@@ -21,23 +21,21 @@ def run_execution_cycle():
         return
 
     if issue_number:
-        # triggered by label event - fix that specific issue
         issue = next((i for i in issues if str(i["number"]) == str(issue_number) and "pull_request" not in i), None)
+        if not issue:
+          print(f"Issue #{issue_number} not found.")
+          return
+        execute_issue(issue)
+        
     else:
-    # manual trigger - bulk run up to 5
-        eligible = [i for i in issues if "pull_request" not in i][:5]
-        if not eligible:
-            print("No eligible issues found.")
+        issues_to_run = [i for i in issues if "pull_request" not in i][:5]
+        if not issues_to_run:
+            print("No issues issues found.")
             return
-        print(f"Found {len(eligible)} eligible issues. Running in parallel...")
+        print(f"Found {len(issues_to_run)} issues. Running in parallel...")
         with ThreadPoolExecutor(max_workers=5) as executor:
-            executor.map(execute_issue, eligible)
+            executor.map(execute_issue, issues_to_run)
 
-    if issue is None:
-        print("No eligible issues found.")
-        return
-
-    execute_issue(issue)
 
 
 if __name__ == "__main__":

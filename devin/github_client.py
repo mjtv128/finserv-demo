@@ -1,6 +1,5 @@
 import os
 import requests
-# import base64
 
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
@@ -50,7 +49,6 @@ def post_comment(issue_number, body):
     response = requests.post(url, headers=HEADERS, json={"body": body})
     response.raise_for_status()
 
-# devin/github_client.py
 
 def get_issue_labels(issue_number):
     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/issues/{issue_number}/labels"

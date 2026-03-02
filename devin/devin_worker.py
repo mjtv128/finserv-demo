@@ -1,5 +1,3 @@
-# devin/devin_worker.py
-
 import os
 from devin.devin_client import create_session, wait_for_session
 

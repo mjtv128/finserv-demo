@@ -1,5 +1,3 @@
-# devin/executor.py
-
 from devin.github_client import (
     post_comment,
     set_devin_status,
