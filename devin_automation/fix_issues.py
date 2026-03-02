@@ -1,5 +1,5 @@
-from devin.github_client import fetch_open_issues
-from devin.issue_runner import execute_issue
+from devin_automation.github_client import fetch_open_issues
+from devin_automation.issue_runner import execute_issue
 import os
 from concurrent.futures import ThreadPoolExecutor
 

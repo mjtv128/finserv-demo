@@ -1,5 +1,5 @@
-from devin.classifier import classify_batch
-from devin.github_client import (
+from devin_automation.classifier import classify_batch
+from devin_automation.github_client import (
     fetch_open_issues,
     label_issue,
     post_comment,
@@ -7,7 +7,7 @@ from devin.github_client import (
     remove_label,
     set_devin_status
 )
-from devin.issue_runner import execute_issue
+from devin_automation.issue_runner import execute_issue
 import os
 
 
@@ -22,10 +22,10 @@ def apply_triage(issue_number, classification):
     recommended_action = classification["recommended_action"]
     reason = classification["reason"]
 
-    existing_labels = get_issue_labels(issue_number)
-    for label in existing_labels:
-        if label.startswith("devin-"):
-            remove_label(issue_number, label)
+    # existing_labels = get_issue_labels(issue_number)
+    # for label in existing_labels:
+    #     if label.startswith("devin-"):
+    #         remove_label(issue_number, label)
 
     label_issue(issue_number, f"devin-{difficulty}")
 

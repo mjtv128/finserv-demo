@@ -1,5 +1,5 @@
 import os
-from devin.devin_client import create_session, wait_for_session
+from devin_automation.devin_client import create_session, wait_for_session
 
 
 def run_issue(issue):

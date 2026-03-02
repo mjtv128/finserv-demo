@@ -1,4 +1,4 @@
-from devin.github_client import (
+from devin_automation.github_client import (
     post_comment,
     set_devin_status,
     remove_label,
@@ -9,7 +9,7 @@ from devin.github_client import (
 )
 
 
-from devin.devin_worker import run_issue
+from devin_automation.devin_worker import run_issue
 
 
 LABEL_IN_PROGRESS = "devin-in-progress"
