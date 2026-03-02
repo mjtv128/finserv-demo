@@ -1,7 +1,6 @@
 import os
 from devin_automation.devin_client import create_session, wait_for_session
 
-
 def run_issue(issue):
     repo = os.environ.get("GITHUB_REPOSITORY")
     issue_number = issue["number"]

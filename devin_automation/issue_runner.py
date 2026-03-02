@@ -1,5 +1,4 @@
 from devin_automation.github_client import (
-    post_comment,
     set_devin_status,
     remove_label,
     pr_exists,
@@ -42,6 +41,7 @@ def execute_issue(issue):
             existing_labels = get_issue_labels(issue_number)
             if "devin-fix" in existing_labels:
                 remove_label(issue_number, "devin-fix")
+            return result.get('pr_url')
 
         else:
             set_devin_status(issue_number, "failed")

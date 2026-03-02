@@ -1,17 +1,13 @@
+import os
 from devin_automation.classifier import classify_batch
 from devin_automation.github_client import (
     fetch_open_issues,
     label_issue,
     post_comment,
-    get_issue_labels,
-    remove_label,
     set_devin_status,
     send_slack
 )
 from devin_automation.issue_runner import execute_issue
-
-import os
-
 
 def chunk_list(lst, size):
     for i in range(0, len(lst), size):
@@ -79,6 +75,7 @@ def main():
     print(f"Processing {len(issues_to_run)} issues...\n")
     pr_count = 0
     flagged_count = 0
+    pr_urls = []
     
     for chunk in chunk_list(issues_to_run, 10):
         # time.sleep(3)
@@ -104,15 +101,18 @@ def main():
 
             if difficulty in ["easy", "medium"]:
                 send_slack(f"⚙️ Devin is working on issue #{number}...")
-                execute_issue(issue)
+                pr_url = execute_issue(issue)
                 pr_count += 1
+                if pr_url:
+                    pr_urls.append(f"• Issue #{number}: {pr_url}")
+                    send_slack(f"✅ Issue #{number} — draft PR opened: {pr_url}")
             else:
                 flagged_count += 1
                 send_slack(f"⚠️ Issue #{number} is *{difficulty}* — flagged for senior review")
                 print(f"Issue #{number} is {difficulty} - skipping execution")
 
-    send_slack(f"📊 Run complete — {pr_count} PR(s) opened, {flagged_count} flagged for review")
-
+    pr_links = "\n".join(pr_urls) if pr_urls else "Check GitHub for PRs"
+    send_slack(f"📊 Run complete — {pr_count} PR(s) opened, {flagged_count} flagged for review\n{pr_links}")
 
 if __name__ == "__main__":
     main()

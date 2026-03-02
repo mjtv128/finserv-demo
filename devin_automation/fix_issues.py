@@ -1,8 +1,7 @@
+import os
 from devin_automation.github_client import fetch_open_issues
 from devin_automation.issue_runner import execute_issue
-import os
 from concurrent.futures import ThreadPoolExecutor
-
 
 def run_execution_cycle():
     print("🚀 Starting execution cycle")

@@ -55,7 +55,6 @@ def wait_for_session(session_id, timeout=300, interval=5):
                 "pr_url": pr.get("html_url") or pr.get("url")
             }
 
-        # ❌ Only fail if explicitly failed
         if status in ["failed", "blocked"]:
             return {
                 "status": status,

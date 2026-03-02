@@ -3,12 +3,10 @@ import requests
 
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
-
 HEADERS = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json"
 }
-
 
 def fetch_open_issues(limit=20):
     url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/issues"
