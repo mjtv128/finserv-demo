@@ -2,6 +2,8 @@ name: Devin Backlog Controller
 
 on:
   workflow_dispatch:
+  issues:
+      types: [labeled]
 
 permissions:
   contents: write
@@ -29,4 +31,6 @@ jobs:
           DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_LABEL: ${{ github.event.label.name }}
         run: python -m devin.fix_issues

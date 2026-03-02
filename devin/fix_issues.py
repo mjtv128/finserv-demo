@@ -2,10 +2,13 @@
 
 from devin.github_client import fetch_open_issues
 from devin.issue_runner import execute_issue
-
+import os
 
 def run_execution_cycle():
     print("🚀 Starting execution cycle")
+    label = os.environ.get("ISSUE_LABEL", "")
+    if label and label != "devin-fix":
+        return
 
     issues = fetch_open_issues(limit=10)
 

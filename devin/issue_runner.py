@@ -40,13 +40,6 @@ def execute_issue(issue):
         if result.get("status") == "completed":
             set_devin_status(issue_number, "completed")
 
-            post_comment(issue_number, f"""
-          ### 🤖 Devin Draft PR Created
-
-          PR URL:
-          {result.get("pr_url")}
-          """)
-
         else:
             set_devin_status(issue_number, "failed")
 
