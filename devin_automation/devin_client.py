@@ -39,7 +39,6 @@ def wait_for_session(session_id, timeout=600, interval=10):
             headers=HEADERS
         )
         
-        # If we get a 504, check one more time before giving up
         if response.status_code == 504:
             time.sleep(10)
             response = requests.get(
@@ -61,7 +60,6 @@ def wait_for_session(session_id, timeout=600, interval=10):
             }
 
         if status in ["failed", "blocked"]:
-            # Check one last time for a PR before marking failed
             pr = data.get("pull_request")
             if pr:
                 return {
