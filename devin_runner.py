@@ -53,10 +53,11 @@ def main():
 
             result = process_issue(issue, classification)
 
-            if result["status"] == "completed":
-                pr_count += 1
-                pr_urls.append(f"• Issue #{number}: {result['pr_url']}")
-            elif result["status"] == "needs_review":
+            if result["final_status"] == "completed":
+                if result["pr_url"]:
+                    pr_count += 1
+                    pr_urls.append(f"• Issue #{number}: {result['pr_url']}")
+            elif result["final_status"] == "needs_review":
                 flagged_count += 1
 
     pr_links = "\n".join(pr_urls) if pr_urls else "Check GitHub for PRs"
