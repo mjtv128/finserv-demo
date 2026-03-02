@@ -32,7 +32,13 @@ Instructions:
 - Do not modify unrelated files.
 - Commit changes.
 - Open a DRAFT pull request targeting the default branch.
-- Reference issue #{issue_number} in the PR description.
+- In the PR description include:
+  - What the bug was
+  - What the fix does
+  - A short checklist for the human reviewer
+- Reference and close issue #{issue_number} in the PR description using "Closes #{issue_number}".
+- Add the label 'devin-generated' to the PR after creating it.
+- Post a comment on issue #{issue_number} saying: "🤖 Draft PR opened: [PR URL]"
 - Do NOT merge the PR.
 - Stop once the draft PR is successfully created.
 """
