@@ -13,7 +13,7 @@ def process_issue(issue, classification):
     recommended_action = classification["recommended_action"]
     reason = classification["reason"]
 
-    set_devin_status(number, "running")
+    # set_devin_status(number, "running")
     label_issue(number, f"devin-{difficulty}")
 
     body = (
