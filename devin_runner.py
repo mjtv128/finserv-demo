@@ -3,6 +3,7 @@ from devin_automation.classifier import classify_batch
 from devin_automation.github_client import (
     fetch_open_issues,
     send_slack,
+    set_devin_status
 )
 from devin_automation.triage_controller import process_issue
 
@@ -16,6 +17,10 @@ def main():
     print("Starting Devin backlog automation...\n")
 
     issue_number = os.environ.get("ISSUE_NUMBER")
+    label = os.environ.get("ISSUE_LABEL", "")
+    if label and label != "devin-fix":
+        print("Label not eligible. Skipping.")
+        return
 
     issues = fetch_open_issues(limit=50)
     issues = [i for i in issues if "pull_request" not in i]
@@ -32,6 +37,9 @@ def main():
         issues_to_run = [i for i in issues if str(i["number"]) == str(issue_number)]
     else:
         issues_to_run = issues[:5]
+        
+    for issue in issues_to_run:
+        set_devin_status(issue["number"], "running")
 
     send_slack(f"🚀 Devin automation started — processing {len(issues_to_run)} issue(s)")
 

@@ -62,12 +62,10 @@ def set_devin_status(issue_number, new_status):
 
     current_labels = get_issue_labels(issue_number)
 
-    # Remove any existing devin-status labels
     for label in current_labels:
         if label.startswith("devin-status:"):
             remove_label(issue_number, label)
 
-    # Add new status
     label_issue(issue_number, f"devin-status: {new_status}")
 
 def pr_exists(issue_number):
