@@ -16,7 +16,7 @@ def create_session(prompt, schema=None):
     }
 
     if schema:
-        payload["response_schema"] = schema
+        payload["structured_output_schema"] = schema
 
     response = requests.post(
         BASE_URL,
@@ -81,10 +81,10 @@ def wait_for_structured_output(session_id, timeout=120, interval=5):
         status = data.get("status_enum")
         print("Classifier status:", status)
 
-        if data.get("structured_output"):
-            return data["structured_output"]
+        if status in ["blocked", "finished"]:
+            return data.get("structured_output")
 
-        if status in ["failed", "blocked"]:
+        if status == "failed":
             return None
 
     raise TimeoutError("Classifier session timed out.")

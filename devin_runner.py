@@ -74,6 +74,7 @@ def main():
     print(f"Processing {len(issues_to_run)} issues...\n")
 
     for chunk in chunk_list(issues_to_run, 10):
+        # time.sleep(3)
         results = classify_batch(chunk)
         result_map = {r["issue_number"]: r for r in results}
 
