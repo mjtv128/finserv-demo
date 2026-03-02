@@ -7,6 +7,7 @@ from devin.github_client import (
     pr_exists,
     branch_exists,
     status_is_completed,
+    get_issue_labels
 )
 
 
@@ -39,6 +40,10 @@ def execute_issue(issue):
 
         if result.get("status") == "completed":
             set_devin_status(issue_number, "completed")
+            
+            existing_labels = get_issue_labels(issue_number)
+            if "devin-fix" in existing_labels:
+                remove_label(issue_number, "devin-fix")
 
         else:
             set_devin_status(issue_number, "failed")
