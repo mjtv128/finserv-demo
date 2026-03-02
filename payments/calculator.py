@@ -5,5 +5,6 @@ def calculate_fee(amount, percentage):
 
 
 def apply_discount(amount, discount):
-    # Bug: discount can exceed 100%
+    if discount < 0 or discount > 1.0:
+        raise ValueError("Discount must be between 0 and 1.0 (0% to 100%).")
     return amount - (amount * discount)
