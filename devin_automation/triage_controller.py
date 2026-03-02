@@ -17,8 +17,7 @@ def process_issue(issue, classification):
 
     label_issue(number, f"devin-{difficulty}")
 
-    body = f"""
-    **Devin Triage Summary**
+    body = f"""**Devin Triage Summary**
 
     **Summary**
     {summary}
