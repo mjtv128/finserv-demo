@@ -1,3 +1,4 @@
 def format_currency(amount):
-    # Bug: doesn't handle None
+    if amount is None:
+        return None
     return "$" + str(round(amount, 2))
