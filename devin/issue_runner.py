@@ -31,7 +31,7 @@ def execute_issue(issue):
         print("Already completed. Skipping.")
         return
       
-    set_devin_status(issue_number, "running")
+    # set_devin_status(issue_number, "running")
 
     try:
         result = run_issue(issue)
@@ -51,5 +51,4 @@ def execute_issue(issue):
         set_devin_status(issue_number, "failed")
 
     finally:
-        # Always unlock
         remove_label(issue_number, LABEL_IN_PROGRESS)

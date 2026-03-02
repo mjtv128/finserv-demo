@@ -4,7 +4,8 @@ from devin.github_client import (
     label_issue,
     post_comment,
     get_issue_labels,
-    remove_label
+    remove_label,
+    set_devin_status
 )
 from devin.issue_runner import execute_issue
 import os
@@ -21,18 +22,15 @@ def apply_triage(issue_number, classification):
     recommended_action = classification["recommended_action"]
     reason = classification["reason"]
 
-    # Remove existing devin-* labels
     existing_labels = get_issue_labels(issue_number)
     for label in existing_labels:
         if label.startswith("devin-"):
             remove_label(issue_number, label)
 
-    # Apply fresh label
     label_issue(issue_number, f"devin-{difficulty}")
 
-    # Post updated triage comment
     comment_body = f"""
-🤖 **Devin Triage Summary**
+ **Devin Triage Summary**
 
 **Summary**
 {summary}
@@ -51,7 +49,7 @@ def apply_triage(issue_number, classification):
 
 
 def main():
-    print("🚀 Starting Devin backlog automation...\n")
+    print("Starting Devin backlog automation...\n")
 
     label = os.environ.get("ISSUE_LABEL", "")
     if label and label != "devin-fix":
@@ -70,6 +68,9 @@ def main():
         issues_to_run = [i for i in issues if str(i["number"]) == str(issue_number)]
     else:
         issues_to_run = issues[:5]
+        
+    for issue in issues_to_run:
+        set_devin_status(issue["number"], "running")
 
     print(f"Processing {len(issues_to_run)} issues...\n")
 
