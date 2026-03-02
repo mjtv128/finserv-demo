@@ -40,7 +40,9 @@ Both modes run the same pipeline — classify first, then fix.
 ## Project Structure
 
 `devin_runner.py` sits at the root as the orchestration layer — it coordinates classification and execution across all targeted issues. 
+
 `devin_automation/` contains the underlying automation packages. 
+
 `finserv_core/` is the demo application and can be swapped out for any real codebase.
 ```
 finserv-demo/
