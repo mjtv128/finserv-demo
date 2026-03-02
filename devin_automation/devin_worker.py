@@ -1,5 +1,5 @@
 import os
-from devin_automation.devin_client import create_session, wait_for_session
+from devin_automation.devin_client import create_session, wait_for_session, terminate_session
 
 def run_issue(issue):
     repo = os.environ.get("GITHUB_REPOSITORY")
@@ -40,4 +40,6 @@ Instructions:
 """
 
     session_id = create_session(prompt)
-    return wait_for_session(session_id)
+    result = wait_for_session(session_id)
+    terminate_session(session_id)
+    return result

@@ -87,3 +87,9 @@ def wait_for_structured_output(session_id, timeout=120, interval=5):
             return None
 
     raise TimeoutError("Classifier session timed out.")
+
+def terminate_session(session_id):
+    requests.delete(
+        f"{BASE_URL}/{session_id}",
+        headers=HEADERS
+    )

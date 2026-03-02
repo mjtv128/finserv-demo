@@ -57,6 +57,8 @@ def main():
     issue_number = os.environ.get("ISSUE_NUMBER")
     issues = fetch_open_issues(limit=50)
     issues = [i for i in issues if "pull_request" not in i]
+    issues = [i for i in issues if not any(l["name"] == "devin-status: completed" for l in i.get("labels", []))]
+
 
     if not issues:
         print("No open issues found.")
@@ -100,7 +102,7 @@ def main():
             send_slack(f"🔍 Issue #{number} classified as *{difficulty.upper()}* — {summary}")
 
             if difficulty in ["easy", "medium"]:
-                send_slack(f"⚙️ Devin is working on issue #{number}...")
+                send_slack(f"⚙️ Devin is fixing issue #{number}...")
                 pr_url = execute_issue(issue)
                 pr_count += 1
                 if pr_url:
