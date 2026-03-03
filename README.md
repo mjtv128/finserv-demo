@@ -101,3 +101,14 @@ Get your key at [app.devin.ai/settings/api-keys](https://app.devin.ai/settings/a
 **4. Trigger**
 
 Add `devin-fix` to an issue, or run the workflow manually from the Actions tab.
+
+---
+
+## Try It Yourself
+
+1. Fork this repo
+2. Add `DEVIN_API_KEY` and `SLACK_WEBHOOK_URL` to your GitHub Secrets
+3. Connect Devin to your repo at [app.devin.ai](https://app.devin.ai) → Settings → Integrations → GitHub
+4. Create the labels listed above
+5. Open an issue and add the `devin-fix` label — or trigger the workflow manually from the Actions tab
+6. Watch Devin classify, fix, and open a draft PR
