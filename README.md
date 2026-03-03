@@ -34,6 +34,7 @@ Both modes run the same pipeline — classify first, then fix.
 - **Devin API** — sessions are created programmatically via the Devin API. One session for classification, a separate session per issue for the fix.
 - **GitHub** — Devin is connected to the repository via the Devin GitHub integration, giving it authenticated access to create branches and open PRs. All labels, comments, and status updates are written back to GitHub via the GitHub API.
 - **GitHub Actions** — the entire workflow is triggered and run inside GitHub Actions. No external infrastructure needed.
+- - **Slack** — real-time notifications are posted to a Slack channel at every stage of the pipeline. Engineers are kept in the loop without leaving Slack — from automation start, to classification results, to PR opened, to run complete summary.
 
 ---
 
@@ -56,10 +57,11 @@ finserv-demo/
 │   ├── devin_worker.py         # Builds the fix prompt and calls Devin
 │   ├── devin_client.py         # Devin API client
 │   └── github_client.py        # GitHub API client
+│   └── triage_classifier.py    # Orchestrates triage and routes to execution
 │
 ├── finserv_core/               # Demo application — can be any repo or codebase
 │
-├── devin_runner.py             # Orchestration layer — entry point, runs the full pipeline
+├── devin_runner.py             # Entry point — runs the full pipeline
 └── README.md
 ```
 ---
@@ -76,6 +78,7 @@ finserv-demo/
 | `devin-status: running` | Pipeline is active |
 | `devin-status: completed` | Draft PR is open |
 | `devin-status: failed` | Devin couldn't complete the fix |
+| `devin-status: needs review` | Manual Review needed |
 
 ---
 
