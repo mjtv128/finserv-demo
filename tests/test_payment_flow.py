@@ -1,7 +1,7 @@
 from decimal import Decimal
 from finserv_core.accounts.models import Account
 from finserv_core.infrastructure.repository import InMemoryAccountRepository
-from finserv_core.payments.models import Payment
+from finserv_core.payments.models import Payment, PaymentStatus
 from finserv_core.payments.service import PaymentService
 
 def test_payment_success():
@@ -19,7 +19,8 @@ def test_payment_success():
         currency="USD"
     )
 
-    service.process_payment(payment)
+    result = service.process_payment(payment)
 
     assert a1.balance == Decimal("900")
     assert a2.balance == Decimal("600")
+    assert result.status == PaymentStatus.COMPLETED
